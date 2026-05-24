@@ -264,7 +264,7 @@ def section_service_auth(quick: bool) -> Section:
                 )
                 return await asyncio.wait_for(
                     client.chat.completions.create(
-                        model=env_vars.get("NEBIUS_SMOKE_MODEL", "google/gemma-2-2b-it"),
+                        model=env_vars.get("NEBIUS_SMOKE_MODEL", "google/gemma-3-27b-it"),
                         messages=[{"role": "user", "content": "ok"}],
                         max_tokens=3,
                     ),
