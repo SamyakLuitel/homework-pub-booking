@@ -108,8 +108,9 @@ async def run_voice_mode(session: Session, persona: ManagerPersona, max_turns: i
         )
     except ImportError as e:
         print(
-            f"⚠  Missing voice dep: {e.name}. Run 'make setup' with voice extra:\n"
-            "     uv sync --extra voice\n"
+            f"⚠  Missing voice dep: {e.name}. Install voice deps with:\n"
+            "     make setup-voice\n"
+            "   (equivalent: uv sync --extra voice)\n"
             "   Falling back to text mode.",
             file=sys.stderr,
         )
@@ -340,6 +341,8 @@ async def _transcribe_speechmatics(
 # ---------------------------------------------------------------------------
 async def _speak_rime(text: str, api_key: str, sd) -> None:
     """Call Rime.ai TTS, get MP3 back, play it."""
+    import shutil
+
     import httpx
 
     url = "https://users.rime.ai/v1/rime-tts"
@@ -371,6 +374,14 @@ async def _speak_rime(text: str, api_key: str, sd) -> None:
         print(
             "   (pydub not installed; can't decode mp3 for playback — "
             "install with: uv sync --extra voice)",
+            file=sys.stderr,
+        )
+        return
+
+    if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
+        print(
+            "   (ffmpeg/ffprobe not found; can't decode mp3 for playback — "
+            "install system deps, e.g. macOS: brew install ffmpeg)",
             file=sys.stderr,
         )
         return

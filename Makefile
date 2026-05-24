@@ -212,11 +212,12 @@ setup-rasa: ## Install rasa-pro + deps (needed for Ex6 tier 2 and 3)
 .PHONY: setup-voice
 setup-voice: ## Install speechmatics + rime TTS + mic deps (needed for Ex8 voice mode)
 	@echo "▶ Installing voice deps (speechmatics, sounddevice, pydub)..."
-	@echo "   Requires portaudio. On macOS: brew install portaudio"
+	@echo "   Requires system audio tools. On macOS: brew install portaudio ffmpeg"
 	@$(UV) sync --extra voice
 	@echo ""
 	@echo "✓ voice deps installed. For Ex8 voice mode you still need:"
 	@echo "    - SPEECHMATICS_KEY + RIME_API_KEY in .env"
+	@echo "    - ffmpeg + ffprobe on PATH (for MP3 decode/playback via pydub)"
 	@echo "    - macOS: System Settings → Privacy & Security → Microphone"
 	@echo "             → grant your terminal app access"
 	@echo "    - Then: make ex8-voice"

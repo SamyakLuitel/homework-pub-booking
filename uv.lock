@@ -965,6 +965,7 @@ educator = [
     { name = "httpx" },
     { name = "numpy" },
     { name = "pydub" },
+    { name = "setuptools" },
     { name = "sounddevice" },
     { name = "sovereign-agent", extra = ["rasa"] },
     { name = "speechmatics-python" },
@@ -976,6 +977,7 @@ voice = [
     { name = "httpx" },
     { name = "numpy" },
     { name = "pydub" },
+    { name = "setuptools" },
     { name = "sounddevice" },
     { name = "speechmatics-python" },
 ]
@@ -996,6 +998,7 @@ requires-dist = [
     { name = "pydub", marker = "extra == 'voice'", specifier = ">=0.25.1" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "setuptools", marker = "extra == 'voice'", specifier = ">=68" },
     { name = "sounddevice", marker = "extra == 'voice'", specifier = ">=0.4.6" },
     { name = "sovereign-agent", specifier = "==0.2.0" },
     { name = "sovereign-agent", extras = ["rasa"], marker = "extra == 'rasa'", specifier = "==0.2.0" },
