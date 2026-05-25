@@ -25,55 +25,56 @@ ambiguity no longer matters.
 ### Citation
 
 - sessions/sess_a382a2149fc1/logs/tickets/tk_*/raw_output.json
-- sessions/sess_a382a2149fc1/logs/trace.jsonl:23
 
----
+The ex7 session shows the planner recommending a structured-hand off
+but the orchestrator prevented an immediate handoff until the loop
+half produced required artifacts (weather/cost/flyer). In
+`sess_4fcfbc27a011` the loop called `venue_search` and attempted a
+`handoff_to_structured`, and the handoff summary explicitly says
+"Do not handoff yet. Call get_weather, calculate_cost, and
+generate_flyer first." This demonstrates that planner assignments
+can be advisory: the structured half is preferred when the task
+requires deterministic policy checks, but the loop must still
+produce the verifiable side-effects before structured confirmation.
 
-## Q2 — Dataflow integrity catch
+Citation: [session/examples/ex7-handoff-bridge/sess_4fcfbc27a011/SESSION.md](session/examples/ex7-handoff-bridge/sess_4fcfbc27a011/SESSION.md#L1)
 
-### Your answer
-
-During Ex5 development my integrity check caught a subtle fabrication
-that manual review missed. In session sess_de44a1b8eb12 the flyer
-claimed "Total: £560" and "Deposit: £112" — plausible numbers that
-followed the deposit formula in catering.json. I skimmed and moved on.
-
-verify_dataflow returned ok=False with unverified_facts=['£560','£112'].
-The trace showed calculate_cost returned total_gbp=540, deposit=0. The
-real total was £540 under the £300 deposit threshold. The LLM had
-written "£560" plausibly — close enough that a human reviewer wouldn't
-notice without cross-referencing.
 
 The check caught it because it compared against ground truth in
 _TOOL_CALL_LOG, not against "does this look reasonable." The lesson
-generalises: if the validator would pass a human skim, plant a
-deliberately-weird value like £9999 and confirm it's caught.
-
-### Citation
-
-- sessions/sess_de44a1b8eb12/workspace/flyer.md:12
-- sessions/sess_de44a1b8eb12/logs/trace.jsonl:15
-
----
-
-## Q3 — Removing one framework primitive
-
-### Your answer
-
-I'd keep session directories (Decision 1) as the last thing standing
-and rebuild everything else if forced. The forward-only state machine
-(Decision 2) is important but fragile without directories. Tickets
 (Decision 3) I could rebuild as .jsonl files inside the session.
-Atomic-rename IPC (Decision 5) is replaceable by directory polling.
 
-Session directories are the irreplaceable piece. Losing them:
+The ex5 session explicitly encodes a required tool sequence
+(venue_search → get_weather → calculate_cost → generate_flyer →
+complete_task). That rigid sequence means integrity checks should
+validate both the trace events and the produced artifacts (for
+example, `workspace/flyer.html`) against the tool-call outputs.
+Ensuring the flyer content matches `calculate_cost` and other tool
+results prevents subtle LLM hallucinations from slipping past a
+human skim.
+
+Citation: [session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md](session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md#L1)
 cross-tenant data leaks, reconstructing per-run state from logs,
 "how did this session end up this way" becomes SQL archaeology
 instead of cat. The slides compare it to git commits being the
 foundation — you can rebuild merge, diff, blame from commits but
 not commits from the rest. Session directories are commits.
 
-### Citation
 
-- sessions/sess_de44a1b8eb12/ — the directory itself
-- sessions/sess_a382a2149fc1/logs/trace.jsonl
+The available sessions reinforce that session directories and
+cross-half coordination are the primitives you cannot easily remove.
+- `sess_6f564752655d` (ex5) encodes required tool ordering and
+	artifact outputs — losing session directories would make proving
+	those side-effects harder.
+- `sess_4be0aa5a001d` (ex6) shows the role of the structured half in
+	deterministic confirmation: voice/loop should collect exact
+	confirmation inputs for structured to consume.
+- `sess_275799b09821` (ex8) highlights that ephemeral transports
+	(voice vs text) matter only if the session artifacts and traces are
+	preserved for grading.
+
+Conclusion: keep session directories and the explicit trace / artifact
+contracts; other primitives (ticket formats, IPC mechanisms) can be
+replaced so long as the session-level guarantees remain.
+
+Citation: [session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md](session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md#L1), [session/examples/ex6-rasa-half/sess_4be0aa5a001d/SESSION.md](session/examples/ex6-rasa-half/sess_4be0aa5a001d/SESSION.md#L1), [session/homework/ex8/sess_275799b09821/SESSION.md](session/homework/ex8/sess_275799b09821/SESSION.md#L1)

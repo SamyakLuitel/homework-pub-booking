@@ -1,0 +1,73 @@
+{
+  "session_id": "sess_4fcfbc27a011",
+  "version": 1,
+  "created_at": "2026-05-25T10:05:35.913413+00:00",
+  "updated_at": "2026-05-25T10:05:35.918479+00:00",
+  "scenario": "ex7-handoff-bridge",
+  "state": "completed",
+  "user_id": null,
+  "current_half": "loop",
+  "planner": {
+    "subgoals": [
+      {
+        "id": "sg_1",
+        "description": "find venue near haymarket for 12",
+        "success_criterion": "candidate identified",
+        "estimated_tool_calls": 2,
+        "depends_on": [],
+        "assigned_half": "loop",
+        "status": "pending"
+      }
+    ]
+  },
+  "executor": {},
+  "structured": {},
+  "memory": {},
+  "handoff_history": [],
+  "bare_mode": false,
+  "config_overrides": {},
+  "result": {
+    "final_answer": "[{\"id\": \"sg_1\", \"description\": \"retry with larger venue after rejection\", \"success_criterion\": \"different venue with enough seats\", \"estimated_tool_calls\": 2, \"depends_on\": [], \"assigned_half\": \"loop\"}]",
+    "executor_results": [
+      {
+        "subgoal_id": "sg_1",
+        "success": true,
+        "final_answer": "[{\"id\": \"sg_1\", \"description\": \"retry with larger venue after rejection\", \"success_criterion\": \"different venue with enough seats\", \"estimated_tool_calls\": 2, \"depends_on\": [], \"assigned_half\": \"loop\"}]",
+        "turns_used": 3,
+        "tool_calls_made": [
+          {
+            "name": "venue_search",
+            "arguments": {
+              "near": "Haymarket",
+              "party_size": 12,
+              "budget_max_gbp": 2000
+            },
+            "success": true,
+            "summary": "venue_search(Haymarket, party=6): 1 result(s)",
+            "requires_human_approval": false
+          },
+          {
+            "name": "handoff_to_structured",
+            "arguments": {
+              "reason": "loop half identified a candidate venue; passing to structured half for confirmation under policy rules",
+              "context": "party of 12 near Haymarket on 2026-04-25 19:30; chosen venue haymarket_tap",
+              "data": {
+                "action": "confirm_booking",
+                "venue_id": "Haymarket Tap",
+                "date": "2026-04-25",
+                "time": "19:30",
+                "party_size": "12",
+                "deposit": "\u00a30"
+              }
+            },
+            "success": false,
+            "summary": "Do not handoff yet. Call get_weather, calculate_cost, and generate_flyer first.",
+            "requires_human_approval": false
+          }
+        ],
+        "handoff_requested": false
+      }
+    ]
+  },
+  "resumed_from": null
+}

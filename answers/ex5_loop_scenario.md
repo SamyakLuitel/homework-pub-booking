@@ -2,25 +2,25 @@
 
 ## Your answer
 
-The planner produced two subgoals: sg_1 (research venues near Haymarket
-for a party of 6, assigned to loop) and sg_2 (produce a flyer with the
-chosen venue, weather, and cost, also loop). Both ran in the same
-executor session.
+From the recorded session, the loop half first planned 3 subgoals
+(sg_1..sg_3), then executed tools with a recovery loop before completion.
+The first successful tool call was `venue_search` (summary says
+"venue_search(Haymarket, party=6): 1 result(s)"). A second `venue_search`
+attempt was rejected ("STOP calling venue_search..."). The next
+`generate_flyer` attempt also failed because weather and cost were still
+missing.
 
-Turn 1 called venue_search, get_weather, and calculate_cost in parallel
-— all three are parallel_safe because they only read fixtures. Turn 2
-wrote the flyer via generate_flyer (parallel_safe=False because it
-writes a file). Turn 3 called complete_task.
+After that, the executor called `get_weather` and `calculate_cost`
+successfully, then retried `generate_flyer` and wrote
+`workspace/flyer.html` successfully. Finally it called `complete_task`
+with `flyer_path: workspace/flyer.html` and marked the session complete.
 
-The dataflow integrity check caught one issue during development: the
-template for "no deposit required" originally read "total under £300
-threshold", which put £300 in the flyer prose. That value was never
-returned by any tool — it's a rule threshold, not data. I simplified
-the phrasing to "No deposit required for this booking." Without the
-integrity check this would have slipped past review because £300 looks
-like a reasonable number in the right context.
+So this run demonstrates the loop behavior clearly: attempt, validator
+feedback, corrective tool calls, retry, then completion.
 
 ## Citations
 
-- sessions/sess_*/logs/trace.jsonl — tool call sequence
-- sessions/sess_*/workspace/flyer.md — the produced flyer
+- session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md
+- session/examples/ex5-edinburgh-research/sess_6f564752655d/session.json
+- session/examples/ex5-edinburgh-research/sess_6f564752655d/logs/trace.jsonl
+- session/examples/ex5-edinburgh-research/sess_6f564752655d/workspace/flyer.html

@@ -1,0 +1,21 @@
+{
+  "ticket_id": "tk_ee9e5ab6",
+  "operation": "planner.plan",
+  "started_at": "2026-05-25T09:44:14.100138+00:00",
+  "completed_at": "2026-05-25T09:44:31.011991+00:00",
+  "duration_ms": 16911,
+  "outputs": [
+    {
+      "path": "/Users/user/nebius/ai-agent/submission/homework-pub-booking/session/examples/ex5-edinburgh-research/sess_6f564752655d/logs/tickets/tk_ee9e5ab6/raw_output.json",
+      "sha256": "5791cd56af9ae0c2a6748361d1c85fa50c6879b92e82738a054f760150f5c6d0",
+      "size_bytes": 968,
+      "content_type": "application/json"
+    }
+  ],
+  "metrics": {
+    "num_subgoals": 3,
+    "llm_tokens_in": 262,
+    "llm_tokens_out": 2541,
+    "llm_model": "Qwen/Qwen3-Next-80B-A3B-Thinking"
+  }
+}

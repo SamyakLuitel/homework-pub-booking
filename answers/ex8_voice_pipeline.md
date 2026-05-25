@@ -28,3 +28,12 @@ real model.
 
 - starter/voice_pipeline/voice_loop.py — run_voice_mode
 - starter/voice_pipeline/manager_persona.py — LLM-backed persona
+
+## Reflection (sessions)
+
+- **Planning state matters:** the ex8 voice session was left in `planning`, indicating the pipeline must robustly collect booking details before handoff. See [session/homework/ex8/sess_275799b09821/SESSION.md](session/homework/ex8/sess_275799b09821/SESSION.md#L1).
+- **Handoff discipline:** in ex7 the loop half attempted a handoff but was instructed to run additional checks (weather/cost/flyer) first — voice should gather and emit required artifacts before requesting structured confirmation. See [session/examples/ex7-handoff-bridge/sess_4fcfbc27a011/SESSION.md](session/examples/ex7-handoff-bridge/sess_4fcfbc27a011/SESSION.md#L1) and its [session JSON](session/examples/ex7-handoff-bridge/sess_4fcfbc27a011/session.json#L1).
+- **Trace / tool-sequence expectations:** ex5 demonstrates scenarios where specific tool sequences (venue_search → get_weather → calculate_cost → generate_flyer → complete_task) are required by graders; the voice pipeline's `voice.utterance_in` / `voice.utterance_out` trace events satisfy the grader's need for a stable trace contract but you must also ensure any required side-effects (files, tool calls) are produced when the scenario expects them. See [session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md](session/examples/ex5-edinburgh-research/sess_6f564752655d/SESSION.md#L1).
+- **Cross-half coordination:** ex6's planning state reinforces that confirming bookings often belongs in the structured half; voice should aim to collect deterministic confirmation inputs (date, time, party size, venue id) so the structured half can deterministically confirm. See [session/examples/ex6-rasa-half/sess_4be0aa5a001d/SESSION.md](session/examples/ex6-rasa-half/sess_4be0aa5a001d/SESSION.md#L1).
+
+These session observations validate the design choice in `voice_loop.py` to emit stable trace events and gracefully degrade to text mode: they make it easier to prove the pipeline produced the expected artifacts before any structured handoff or grading check.
