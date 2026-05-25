@@ -101,11 +101,11 @@ def fact_appears_in_log(fact: Any, log: list[ToolCallRecord] | None = None) -> b
     target = str(fact).lower().strip("£°c ")
 
     def _scan(obj: Any) -> bool:
-        if isinstance(obj, (str, int, float)):
+        if isinstance(obj, str | int | float):
             return str(obj).lower().strip("£°c ") == target
         if isinstance(obj, dict):
             return any(_scan(v) for v in obj.values())
-        if isinstance(obj, (list, tuple, set)):
+        if isinstance(obj, list | tuple | set):
             return any(_scan(v) for v in obj)
         return False
 

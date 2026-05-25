@@ -1,0 +1,25 @@
+{
+  "session_id": "sess_36cfcb0fa47b",
+  "result": {
+    "venue": {
+      "id": "haymarket_tap",
+      "name": "Haymarket Tap",
+      "address": "12 Dalry Rd, Edinburgh EH11 2BG",
+      "capacity": 8,
+      "min_spend_gbp": 200,
+      "hire_fee_gbp": 0,
+      "licensed_hours": "11:00-00:30",
+      "outdoor_space": false
+    },
+    "event": {
+      "date": "2026-04-25",
+      "time": "19:30",
+      "party_size": 6,
+      "total_cost": 556,
+      "deposit_required": 111,
+      "weather": "cloudy",
+      "temperature": "12\u00b0C",
+      "wind": "15 km/h"
+    }
+  }
+}

@@ -165,7 +165,7 @@ _GBP_PATTERN = re.compile(r"£?\s*(\d+(?:\.\d+)?)\s*(?:gbp|GBP)?", re.IGNORECASE
 def parse_currency_gbp(raw: str | int | float) -> int:
     """Parse '£500', '500', '500 GBP', 500, 500.0 → 500 (int pounds).
     Rejects negative and non-numeric input."""
-    if isinstance(raw, (int, float)):
+    if isinstance(raw, int | float):
         if raw < 0:
             raise ValidationFailed(f"negative currency: {raw!r}")
         return int(raw)

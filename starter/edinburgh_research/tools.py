@@ -113,7 +113,7 @@ def venue_search(near: str, party_size: int, budget_max_gbp: int = 1000) -> Tool
         with open(venues_path, encoding="utf-8") as fh:
             venues = json.load(fh)
     except Exception as exc:  # pragma: no cover - defensive
-        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc)
+        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc) from exc
 
     near_l = (near or "").lower()
     results: list[dict] = []
@@ -125,18 +125,25 @@ def venue_search(near: str, party_size: int, budget_max_gbp: int = 1000) -> Tool
                 continue
             if int(v.get("seats_available_evening", 0)) < int(party_size):
                 continue
-            if int(v.get("hire_fee_gbp", 0)) + int(v.get("min_spend_gbp", 0)) > int(
-                budget_max_gbp
-            ):
+            if int(v.get("hire_fee_gbp", 0)) + int(v.get("min_spend_gbp", 0)) > int(budget_max_gbp):
                 continue
         except Exception:
             # Skip malformed entries rather than crashing the whole tool.
             continue
         results.append(v)
 
-    output = {"near": near, "party_size": int(party_size), "results": results, "count": len(results)}
+    output = {
+        "near": near,
+        "party_size": int(party_size),
+        "results": results,
+        "count": len(results),
+    }
     # record for integrity audit
-    record_tool_call("venue_search", {"near": near, "party_size": int(party_size), "budget_max_gbp": int(budget_max_gbp)}, output)
+    record_tool_call(
+        "venue_search",
+        {"near": near, "party_size": int(party_size), "budget_max_gbp": int(budget_max_gbp)},
+        output,
+    )
 
     summary = f"venue_search({near}, party={party_size}): {len(results)} result(s)"
     return ToolResult(success=True, output=output, summary=summary)
@@ -160,13 +167,15 @@ def get_weather(city: str, date: str) -> ToolResult:
     weather_path = _SAMPLE_DATA / "weather.json"
     if not weather_path.exists():
         # This is a dependency problem — raise so the caller sees it as an exception
-        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=f"weather fixture missing: {weather_path}")
+        raise ToolError(
+            code="SA_TOOL_DEPENDENCY_MISSING", message=f"weather fixture missing: {weather_path}"
+        )
 
     try:
         with open(weather_path, encoding="utf-8") as fh:
             data = json.load(fh)
     except Exception as exc:  # pragma: no cover - defensive
-        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc)
+        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc) from exc
 
     city_key = (city or "").lower()
     if city_key not in data:
@@ -225,7 +234,9 @@ def calculate_cost(
     catering_path = _SAMPLE_DATA / "catering.json"
     venues_path = _SAMPLE_DATA / "venues.json"
     if not catering_path.exists() or not venues_path.exists():
-        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message="catering or venues fixture missing")
+        raise ToolError(
+            code="SA_TOOL_DEPENDENCY_MISSING", message="catering or venues fixture missing"
+        )
 
     try:
         with open(catering_path, encoding="utf-8") as fh:
@@ -233,12 +244,23 @@ def calculate_cost(
         with open(venues_path, encoding="utf-8") as fh:
             venues = {v["id"]: v for v in json.load(fh)}
     except Exception as exc:  # pragma: no cover - defensive
-        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc)
+        raise ToolError(code="SA_TOOL_DEPENDENCY_MISSING", message=str(exc), cause=exc) from exc
 
     base_rates = catering.get("base_rates_gbp_per_head", {})
     if catering_tier not in base_rates:
-        err = ToolError(code="SA_TOOL_INVALID_INPUT", message=f"unknown catering_tier: {catering_tier}")
-        record_tool_call("calculate_cost", {"venue_id": venue_id, "party_size": party_size, "duration_hours": duration_hours, "catering_tier": catering_tier}, {"error": err.to_dict()})
+        err = ToolError(
+            code="SA_TOOL_INVALID_INPUT", message=f"unknown catering_tier: {catering_tier}"
+        )
+        record_tool_call(
+            "calculate_cost",
+            {
+                "venue_id": venue_id,
+                "party_size": party_size,
+                "duration_hours": duration_hours,
+                "catering_tier": catering_tier,
+            },
+            {"error": err.to_dict()},
+        )
         return ToolResult(success=False, output={}, summary=str(err), error=err)
 
     if venue_id not in venues:
@@ -281,7 +303,16 @@ def calculate_cost(
         "total_gbp": int(total),
         "deposit_required_gbp": int(deposit_required),
     }
-    record_tool_call("calculate_cost", {"venue_id": venue_id, "party_size": int(party_size), "duration_hours": int(duration_hours), "catering_tier": catering_tier}, output)
+    record_tool_call(
+        "calculate_cost",
+        {
+            "venue_id": venue_id,
+            "party_size": int(party_size),
+            "duration_hours": int(duration_hours),
+            "catering_tier": catering_tier,
+        },
+        output,
+    )
     summary = f"calculate_cost({venue_id}, {party_size}): total £{output['total_gbp']}, deposit £{output['deposit_required_gbp']}"
     return ToolResult(success=True, output=output, summary=summary)
 
@@ -315,7 +346,7 @@ def generate_flyer(session: Session, event_details: dict) -> ToolResult:
     try:
         out_path = session.path(flyer_rel)
     except Exception as exc:
-        raise ToolError(code="SA_TOOL_EXECUTION_FAILED", message=str(exc), cause=exc)
+        raise ToolError(code="SA_TOOL_EXECUTION_FAILED", message=str(exc), cause=exc) from exc
 
     def pick(*keys: str, default: str = "") -> str:
         for key in keys:
