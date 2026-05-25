@@ -1,1 +1,0 @@
-Executor completed subgoal sg_1 in 7 turn(s). Made 7 tool call(s): venue_search, venue_search, generate_flyer, get_weather, calculate_cost, generate_flyer, complete_task.

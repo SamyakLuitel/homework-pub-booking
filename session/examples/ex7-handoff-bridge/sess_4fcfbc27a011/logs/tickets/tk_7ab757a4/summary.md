@@ -1,1 +1,0 @@
-Executor completed subgoal sg_1 in 3 turn(s). Made 2 tool call(s): venue_search, handoff_to_structured.
